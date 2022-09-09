@@ -1,5 +1,5 @@
 # Arc-well
-This repository contains the scripts used for in the manuscript: Archival single cell sequencing reveals subclonal dormancy over years to decades of DCIS progression.
+This repository contains the scripts used for in the manuscript: Archival single cell sequencing reveals persistent subclones over years to decades of DCIS progression.
 
 
 Scripts are available in the folder R.
