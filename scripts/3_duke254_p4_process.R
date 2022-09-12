@@ -16,7 +16,7 @@ library(ggtree)
 library(Homo.sapiens)
 options(max.print = 200)
 
-source("./scripts/arcwell_functions.R")
+source("./scripts/0_arcwell_functions.R")
 load("./pre_load_data/pre_load_data.rda")
 chr_name <- unlist(read.table("./pre_load_data/chr_name.txt"), use.names = F)
 chr_color <- read.table("./pre_load_data/chr_color.txt")
@@ -26,7 +26,7 @@ new_pal = c("#CC0C00B2", "#5C88DAB2", "#84BD00B2", "#FFCD00B2", "#7C878EB2", "#0
             "#FFA500", "#458B00", "#CD6090", "#FFAEB9", "#90EE90", "#5f9EA0", "#E6E6FA", "#8B7E66")
 new_pal2 <- new_pal
 names(new_pal2) <- paste0("c", 1:length(new_pal2))
-tp_col <- c("deeppink", "chartreuse1")
+tp_col <- c("#EA3291", "#96C942")
 
 setwd("/volumes/USR2/wangkl/wafergen/DNA/ffpe_dcis/github_upload")
 pro_name <- c("duke254_p4")
