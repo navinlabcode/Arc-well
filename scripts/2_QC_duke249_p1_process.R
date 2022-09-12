@@ -16,7 +16,7 @@ library(ggtree)
 library(Homo.sapiens)
 options(max.print = 200)
 
-source("./scripts/arcwell_functions.R")
+source("./scripts/0_arcwell_functions.R")
 load("./pre_load_data/pre_load_data.rda")
 chr_name <- unlist(read.table("./pre_load_data/chr_name.txt"), use.names = F)
 chr_color <- read.table("./pre_load_data/chr_color.txt")
