@@ -20,7 +20,7 @@ options(max.print = 200)
 
 setwd("/volumes/USR2/wangkl/wafergen/DNA/ffpe_dcis/github_upload")
 load("./pre_load_data/pre_load_data.rda")
-source("./scripts/arcwell_functions.R")
+source("./scripts/0_arcwell_functions.R")
 bin_coords <- read.csv("./pre_load_data/bin_coords.csv")
 ######---- Arc-well-mda231 -----########
 #-folder contains ./final_result and ./metrics
