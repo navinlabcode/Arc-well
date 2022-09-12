@@ -1,10 +1,14 @@
 # Arc-well
-This repository contains the scripts used for in the manuscript: Archival single cell sequencing reveals persistent subclones over years to decades of DCIS progression.
+This repository contains the scripts, meta data metrics files used for in the manuscript: Archival single cell sequencing reveals persistent subclones over years to decades of DCIS progression.
 
 
-Scripts are available in the folder R.
+scripts folder includes all of the codes that could reproduce figures of Arc-well paper.
 
-And code to reproduce the figures can be accessed here: https://navinlabcode.github.io/Arc-well/
+pre_load_data are files that required during excuting the R scripts under scripts folder
+
+metrics folder includes filtering files, QC metrics, clinical, computational meta data from cell lines, FFPE samples.
 
 The data from this study has been deposited to the Sequence Read Archive (SRA): PRJNA799605.
+
+For more detailed information, please email nnavin@mdanderson.org 
 
