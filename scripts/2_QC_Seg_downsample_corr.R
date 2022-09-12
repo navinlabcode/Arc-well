@@ -1,4 +1,4 @@
-source("./scripts/arcwell_functions.R")
+source("./scripts/0_arcwell_functions.R")
 setwd("/volumes/USR2/wangkl/wafergen/DNA/ffpe_dcis/github_upload")
 darlan_wd <- c("/volumes/lab/users/dminussi/projects/wafer_ffpe/")
 n_reads_levels <- c('1M', '750k', '500k', '250k', '125k', '75k', '50k')
