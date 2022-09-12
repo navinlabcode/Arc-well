@@ -12,7 +12,7 @@ library(Homo.sapiens)
 library(ggpubr)
 options(max.print = 200)
 
-source("./scripts/arcwell_functions.R")
+source("./scripts/0_arcwell_functions.R")
 load("./pre_load_data/pre_load_data.rda")
 gene_bin <- read.table("./pre_load_data/hg19_gene_binpos_map.tsv", header = 1)
 new_pal = c("#CC0C00B2", "#5C88DAB2", "#84BD00B2", "#FFCD00B2", "#7C878EB2", "#00B5E2B2", "#00AF66B2", "#D2AF81B2", 
