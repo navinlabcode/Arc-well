@@ -1,5 +1,5 @@
 # Arc-well
-This repository contains the scripts, meta data metrics files used for in the manuscript: Archival single cell sequencing reveals persistent subclones over years to decades of DCIS progression.
+This repository contains the scripts, meta data metrics files used in the manuscript: Archival single cell sequencing reveals persistent subclones over years to decades of DCIS progression.
 
 
 scripts folder includes all of the codes that could reproduce figures of Arc-well paper.
