@@ -17,7 +17,7 @@ library(ggalt)
 
 options(max.print = 200)
 
-source("./scripts/arcwell_functions.R")
+source("./scripts/0_arcwell_functions.R")
 load("./pre_load_data/pre_load_data.rda")
 new_pal = c("#CC0C00B2", "#5C88DAB2", "#84BD00B2", "#FFCD00B2", "#7C878EB2", "#00B5E2B2", "#00AF66B2", "#D2AF81B2", 
             "#FD7446B2", "#46732EB2", "#C1395E", "#E07B42","#D4A2D9", "#8E72D5","#C0EDB9", "#364E4F", "#8EE5EE",
