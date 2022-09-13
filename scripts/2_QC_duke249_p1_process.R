@@ -26,7 +26,7 @@ new_pal = c("#CC0C00B2", "#5C88DAB2", "#84BD00B2", "#FFCD00B2", "#7C878EB2", "#0
             "#FFA500", "#458B00", "#CD6090", "#FFAEB9", "#90EE90", "#5f9EA0", "#E6E6FA", "#8B7E66")
 new_pal2 <- new_pal
 names(new_pal2) <- paste0("c", 1:length(new_pal2))
-tp_col <- c("deeppink", "chartreuse1")
+tp_col <- c("#EA3291", "#96C942")
 
 setwd("/volumes/USR2/wangkl/wafergen/DNA/ffpe_dcis/github_upload")
 pro_name <- c("duke249_p1")
