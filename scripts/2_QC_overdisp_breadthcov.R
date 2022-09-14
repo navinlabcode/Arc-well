@@ -303,6 +303,9 @@ write.table(all_meta_lp, file = "./metrics/merged_QC_meta_all_lung_prostate_FFPE
 # all_meta_lp <- read.table(file = "./metrics/merged_QC_meta_all_lung_prostate_FFPE.txt", sep = "\t", header = T)
 
 all_meta <- all_meta %>% dplyr::select(-("dispense")) %>% rbind(all_meta_lp)
+write.table(all_meta, file = "./metrics/merged_QC_meta_all_DCIS_lung_prostate_FFPE.txt", sep = "\t", quote = F, row.names = F)
+# all_meta <- read.table(file = "./metrics/merged_QC_meta_all_DCIS_lung_prostate_FFPE.txt", sep = "\t", header = T)
+
 timepoint_col <- c("primary" = "#EA3291", "recurrence" = "#96C942", "single" = 'royalblue4')
 
 pro_name2 <- c("duke248_p3","duke254_p4","nki23_p5","nki26_p6","nki28_p7","nki19_p8","nki22_p9","nki15_p10","nki31_p11","nki12_p12")
