@@ -190,7 +190,7 @@ bin_count <- varbin_mtx_tumor_log2@assays@data$bin_counts
 bin_count_overdisp <- map_dfr(bin_count, overdispersion) %>% t() %>% as.data.frame()
 bin_count_overdisp2 <- bin_count_overdisp %>% rownames_to_column() %>% rename(over_disp = V1) %>% dplyr::select("over_disp")
 varbin_mtx_tumor_log2@colData <- cbind(varbin_mtx_tumor_log2@colData, bin_count_overdisp2) 
-saveRDS(varbin_mtx_tumor_log2, file = paste0("./objects/", pro_name, c("_final_filtered_meta_overdisp_copykit.rds")))
+saveRDS(varbin_mtx_tumor_log2, file = paste0("./objects/", pro_name, c("_final_filtered_overdisp_copykit.rds")))
 
 #---calculate basic matrices------
 #---reads, pcr dup, and bin for aneuploid cells
