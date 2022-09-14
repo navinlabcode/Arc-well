@@ -283,17 +283,37 @@ for (i in 1:length(pro_name)) {
 write.table(all_meta, file = "./metrics/merged_QC_meta_all_DCIS_FFPE.txt", sep = "\t", quote = F, row.names = F)
 # all_meta <- read.table(file = "./metrics/merged_QC_meta_all_DCIS_FFPE.txt", sep = "\t", header = T)
 
-timepoint_col <- c("primary" = "#EA3291", "recurrence" = "#96C942",
-                   "single" = 'royalblue4')
+#-----Overdispersion for all lung and prostate samples
+pro_name2 <- c("lung30_p1","lung31_p2","prostate_p1_ax4bl","prostate_p2_pcf169")
+#-----create copykit and meta columns of filtered cells---
+all_meta_lp <- data.frame()
+for (i in 1:length(pro_name2)) {
+  print(paste0("Now is runnig: ", pro_name2[i]))
+  varbin_mtx_tumor_log2 <- readRDS(paste0("./objects/", pro_name2[i], c("_final_filtered_overdisp_copykit.rds")))
+  
+  my_meta <- varbin_mtx_tumor_log2@colData %>% as.data.frame() %>% rownames_to_column() %>% 
+    mutate(patient = paste0(pro_name2[i],"_",timepoint)) %>% 
+    dplyr::select(c("sample","reads_total","reads_assigned_bins","percentage_duplicates",
+                    "peak","timepoint","subclones","over_disp","patient"))
+  all_meta_lp <- rbind(all_meta_lp, my_meta)
+}
+
+all_meta_lp$tp_clst <- paste(all_meta_lp$timepoint, all_meta_lp$subclones, sep="_")
+write.table(all_meta_lp, file = "./metrics/merged_QC_meta_all_lung_prostate_FFPE.txt", sep = "\t", quote = F, row.names = F)
+# all_meta_lp <- read.table(file = "./metrics/merged_QC_meta_all_lung_prostate_FFPE.txt", sep = "\t", header = T)
+
+all_meta <- all_meta %>% dplyr::select(-("dispense")) %>% rbind(all_meta_lp)
+timepoint_col <- c("primary" = "#EA3291", "recurrence" = "#96C942", "single" = 'royalblue4')
 
 pro_name2 <- c("duke248_p3","duke254_p4","nki23_p5","nki26_p6","nki28_p7","nki19_p8","nki22_p9","nki15_p10","nki31_p11","nki12_p12")
 time_point <- c("primary","recurrence")
-sample_levels <- c("duke249_p1_recurrence","nki17_p2_primary",paste(rep(pro_name2, each = length(time_point)), time_point, sep = "_"))
+sample_levels <- c("duke249_p1_recurrence","nki17_p2_primary","lung30_p1_primary","lung31_p2_primary", "prostate_p1_ax4bl_primary",
+                   "prostate_p2_pcf169_primary",paste(rep(pro_name2, each = length(time_point)), time_point, sep = "_"))
 
 all_meta2 <- all_meta %>% dplyr::mutate(patient = fct_relevel(patient, sample_levels)) %>% 
-  dplyr::mutate(class = ifelse(stringr::str_detect(patient, "duke249|nki17"), "single", "paired")) %>% 
+  dplyr::mutate(class = ifelse(stringr::str_detect(patient, "duke249|nki17|lung|prostate"), "single", "paired")) %>% 
   dplyr::mutate(class = fct_relevel(class, c("single","paired"))) %>% 
-  dplyr::mutate(timepoint2 = ifelse(stringr::str_detect(patient, "duke249|nki17"), "single", timepoint))
+  dplyr::mutate(timepoint2 = ifelse(stringr::str_detect(patient, "duke249|nki17|lung|prostate"), "single", timepoint))
 
 p1 <- ggplot(all_meta2) + ggbeeswarm::geom_quasirandom(aes(x = patient, y = over_disp, fill = timepoint2), shape = 21, dodge.width = .8) +
   facet_grid(cols = vars(class), scales = "free_x", space = 'free_x') + scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
@@ -304,7 +324,5 @@ p1 <- ggplot(all_meta2) + ggbeeswarm::geom_quasirandom(aes(x = patient, y = over
   ylab("overdispersion") + xlab("") 
 
 p1
-cowplot::ggsave2("./figures/QC_all_DCIS_FFPE_all_overdis.pdf", p1, width = 8, height = 4)
-
-
-
+# cowplot::ggsave2("./figures/QC_all_DCIS_FFPE_all_overdis.pdf", p1, width = 8, height = 4)
+cowplot::ggsave2("./figures/QC_all_DCIS_lung_prostate_FFPE_all_overdis.pdf", p1, width = 8, height = 4.5)
