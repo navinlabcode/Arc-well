@@ -15,6 +15,7 @@ library(tidyr)
 library(cowplot)
 library(useful)
 library(tibble)
+library(copykit)
 library(SummarizedExperiment)
 options(max.print = 200)
 
