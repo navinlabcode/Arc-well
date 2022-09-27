@@ -8,7 +8,6 @@
 # all_stat_metrics.txt
 
 #####-------loading packages-----------################
-library(copykit)
 library(tidyverse)
 library(stringr)
 library(dplyr)
@@ -16,6 +15,7 @@ library(tidyr)
 library(cowplot)
 library(useful)
 library(tibble)
+library(SummarizedExperiment)
 options(max.print = 200)
 
 setwd("/volumes/USR2/wangkl/wafergen/DNA/ffpe_dcis/github_upload")
