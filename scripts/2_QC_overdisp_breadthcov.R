@@ -9,6 +9,7 @@ library(ggplot2)
 require(RColorBrewer)
 library(Homo.sapiens)
 library(ggpubr)
+library(copykit)
 options(max.print = 200)
 
 source("./scripts/0_arcwell_functions.R")
