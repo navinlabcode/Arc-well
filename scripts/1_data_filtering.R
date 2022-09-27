@@ -197,17 +197,6 @@ bcis28_ffpe_qc <- readVarbinCNA(met_path, remove_Y = TRUE, clean_names = FALSE)
 bcis28_ffpe_qc <- filterCells(bcis28_ffpe_qc, resolution = 0.8)
 bcis28_ffpe_qc <- findAneuploid(bcis28_ffpe_qc)
 
-my_palette_h <- c("blue","white","red")
-my_col <- circlize::colorRamp2(breaks = c(-2, 0, 2), colors = my_palette_h)
-pdf("./figures/bcis28_ffpe_qc_filtered_heatmap_newnormal.pdf", height = 8, width = 6)
-plotHeatmap(bcis28_ffpe_qc, label = c("filtered","is_normal"), row_split = "filtered",
-            label_colors = list(
-              filtered = c("removed" = "#DA614D", "kept" = "#5F917A"),
-              is_normal = c("TRUE" = "#396DB3", "FALSE" = "#11181D")),
-            col = my_col,
-            n_threads = 20)
-dev.off()
-
 bcis28_ffpe_qc_metadata <- as.data.frame(colData(bcis28_ffpe_qc))
 # joining with metrics
 bcis28_ffpe_qc_metadata_metrics <- left_join(bcis28_ffpe_qc_metadata, bcis28_ffpe_qc_metrics)
