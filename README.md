@@ -58,5 +58,5 @@ The original sequencing data from this study has been deposited to the Sequence 
 
 ### _Contact_
 ------------
-For more detailed information, please email corresponding author.
+For more detailed information, please [email](mailto:nnavin@mdanderson.org) corresponding author.
 
