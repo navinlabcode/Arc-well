@@ -8,7 +8,8 @@ R scripts in this directory includes all of the codes that could reproduce figur
 - _CNA_pipeline_: includes the workflow of initial QC and variable binning, prepares the inputs for downstream analysis, can be found [here](https://github.com/navinlabcode/CNV_pipeline).
 
 #### pre_load_data 
-files that required during excuting the R scripts under scripts folder
+data required for the R scripts under scripts folder
+
 #### metrics  
 includes filtering files, QC metrics, clinical, computational meta data from cell lines, FFPE samples.
 
@@ -58,5 +59,5 @@ The original sequencing data from this study has been deposited to the Sequence 
 
 ### _Contact_
 ------------
-For more detailed information, please [email](mailto:nnavin@mdanderson.org) corresponding author.
+For any additional information, please [email](mailto:nnavin@mdanderson.org) corresponding author.
 
