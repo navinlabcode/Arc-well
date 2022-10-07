@@ -175,7 +175,7 @@ col_vec = circlize::colorRamp2(breaks =breaks, c("dodgerblue4", "white", "firebr
 
 pdf(paste0("./figures/", pro_name, "_complexHeatmap2.pdf"), height = 8.5, width = 8)
 Heatmap(as.matrix(ht_mtx), cluster_columns = FALSE, border = TRUE, cluster_rows = FALSE, show_row_dend = FALSE, 
-        row_split = anno_mtx$hdb_clst,
+        row_split = anno_mtx$subclones,
         name = "scheatmap", show_row_names = F, show_column_names = F, row_title = paste0("single cells:", nrow(ht_mtx)),
         column_title = paste0(pro_name, "_scHeatmap"),
         use_raster = T, raster_quality = 5, col = col_vec, 
