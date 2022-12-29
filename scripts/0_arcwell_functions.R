@@ -681,6 +681,7 @@ sample_select <- function(df, n, reps = 10, seed = 17){
 countEvents <- function(scCNA, subset, min_bin = 0) {
   # bindings for NSE
   # scCNA <- obj
+  # subset <- "recurrence"
   # subset <- "primary"
   # min_bin <- 1
   arm <- chrarm <- NULL
@@ -690,13 +691,13 @@ countEvents <- function(scCNA, subset, min_bin = 0) {
   dat_seg_cp <- as.data.frame(scCNA@consensus[,names(which(meta[,subset]!=0))])
   
   # split by chrom
-  dat_seg_split <- split(dat_seg_cp, dplyr::pull(rg_chr, chrarm))
+  # dat_seg_split <- split(dat_seg_cp, dplyr::pull(rg_chr, chrarm))
   brkpt_by_chrom <-
-    lapply(dat_seg_split, function(x) {
-      apply(x, 2, function(i) {
+    # lapply(dat_seg_split, function(x) {
+      apply(dat_seg_cp, 2, function(i) {
         sum(rle(i)$lengths>min_bin)
       }) %>% unlist()
-    })
+    # })
   
   brkpt_by_chrom_df <- dplyr::bind_rows(brkpt_by_chrom) %>% t() %>% as.data.frame()
   brkpt_count <- mean(rowSums(brkpt_by_chrom_df))
