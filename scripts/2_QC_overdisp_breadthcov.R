@@ -12,7 +12,7 @@ library(Homo.sapiens)
 library(ggpubr)
 options(max.print = 200)
 
-setwd("/volumes/USR2/wangkl/wafergen/DNA/ffpe_dcis/github_upload3")
+setwd("/volumes/USR2/wangkl/wafergen/DNA/ffpe_dcis/github_upload")
 source("./scripts/0_arcwell_functions.R")
 load("./pre_load_data/pre_load_data.rda")
 gene_bin <- read.table("./pre_load_data/hg19_gene_binpos_map.tsv", header = 1)
