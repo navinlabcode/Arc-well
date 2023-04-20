@@ -105,14 +105,14 @@ p1 <- ggplot(as.data.frame(varbin_mtx_tumor_log@colData),aes(x = UMAP_1, y = UMA
 p1
 cowplot::ggsave2(paste0("./figures/", pro_name, "_passInitialQC_cells_umap.pdf"), p1, width = 5, height = 4)
 
-#----remove outlier cluster c0 and cluster that have less 3 cells.
+#----remove outlier cluster c0 and cluster that have less 6 cells.
 #----paired samples
 clone_num <- table(varbin_mtx_tumor_log@colData$subclones, varbin_mtx_tumor_log@colData$timepoint)
-clone_num_less3 <- as.data.frame(clone_num) %>% filter(Var1 != "c0") %>% filter(Freq > 0 & Freq <4)
+clone_num_less6 <- as.data.frame(clone_num) %>% filter(Var1 != "c0") %>% filter(Freq > 0 & Freq <4)
 
 varbin_mtx_tumor_log2 <- varbin_mtx_tumor_log[, !(subclones == "c0" | 
-                                                    ((varbin_mtx_tumor_log@colData$subclones %in% clone_num_less3$Var1) & 
-                                                       (varbin_mtx_tumor_log@colData$timepoint %in% clone_num_less3$Var2)))]
+                                                    ((varbin_mtx_tumor_log@colData$subclones %in% clone_num_less6$Var1) & 
+                                                       (varbin_mtx_tumor_log@colData$timepoint %in% clone_num_less6$Var2)))]
 varbin_mtx_tumor_log2@colData
 
 p1 <- ggplot(as.data.frame(varbin_mtx_tumor_log2@colData),aes(x = UMAP_1, y = UMAP_2, fill = subclones)) + 
