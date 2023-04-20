@@ -167,6 +167,41 @@ formalin_315a <- formalin_315a[,SummarizedExperiment::colData(formalin_315a)$fil
 bin_coords2 <- bin_coords %>% dplyr::filter(chrom != 24)
 write.table(cbind(bin_coords2,assay(formalin_315a,'bin_counts')), "./metrics/formalin_315a_filtered_bincounts_newnormal.txt",row.names = F)
 
+# MDA231_fresh-------
+met_path <- c("./map_seg_output/fresh_mda231")
+fresh_mda231_metrics <- read.table(paste0(met_path, "/metrics/all_stat_metrics.txt"), sep = "\t", header = T) %>% 
+  dplyr::rename(sample = "Sample.Name") %>% mutate(dups_percentage = DupsRemoved/TotalReads) 
+
+fresh_mda231 <- readVarbinCNA(met_path, remove_Y = TRUE, clean_names = FALSE)
+fresh_mda231 <- filterCells(fresh_mda231, resolution = 0.8)
+
+fresh_mda231_metadata <- as.data.frame(colData(fresh_mda231))
+
+# joining with metrics
+fresh_mda231_metadata_metrics <- left_join(fresh_mda231_metadata, fresh_mda231_metrics)
+write.table(fresh_mda231_metadata_metrics,"./metrics/fresh_mda231_metadata.metrics_newnormal.txt", sep = "\t",row.names = F)
+
+fresh_mda231 <- fresh_mda231[,SummarizedExperiment::colData(fresh_mda231)$filtered == "kept"]
+bin_coords2 <- bin_coords %>% dplyr::filter(chrom != 24)
+write.table(cbind(bin_coords2,assay(fresh_mda231,'bin_counts')), "./metrics/fresh_mda231_filtered_bincounts_newnormal.txt",row.names = F)
+
+# MDA231_formalin-------
+met_path <- c("./map_seg_output/formalin_mda231")
+formalin_mda231_metrics <- read.table(paste0(met_path, "/metrics/all_stat_metrics.txt"), sep = "\t", header = T) %>% 
+  dplyr::rename(sample = "Sample.Name") %>% mutate(dups_percentage = DupsRemoved/TotalReads) 
+
+formalin_mda231 <- readVarbinCNA(met_path, clean_names = FALSE, remove_Y = T)
+formalin_mda231 <- filterCells(formalin_mda231, resolution = 0.8)
+
+formalin_mda231_metadata <- as.data.frame(colData(formalin_mda231))
+# joining with metrics
+formalin_mda231_metadata_metrics <- left_join(formalin_mda231_metadata, formalin_mda231_metrics)
+write.table(formalin_mda231_metadata_metrics,"./metrics/formalin_mda231_metadata.metrics_newnormal.txt", sep = "\t",row.names = F)
+
+formalin_mda231 <- formalin_mda231[,SummarizedExperiment::colData(formalin_mda231)$filtered == "kept"]
+bin_coords2 <- bin_coords %>% dplyr::filter(chrom != 24)
+write.table(cbind(bin_coords2,assay(formalin_mda231,'bin_counts')), "./metrics/formalin_mda231_filtered_bincounts_newnormal.txt",row.names = F)
+
 # bcis28(DCIS)_frozen_QC ----
 met_path <- c("./map_seg_output/bcis28_frozen_qc")
 bcis28_frozen_qc_metrics <- read.table(paste0(met_path, "/metrics/all_stat_metrics.txt"), sep = "\t", header = T) %>% 
