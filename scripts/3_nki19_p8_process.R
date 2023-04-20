@@ -86,13 +86,13 @@ p1 <- ggplot(as.data.frame(varbin_mtx_tumor_log@colData),aes(x = UMAP_1, y = UMA
 p1
 cowplot::ggsave2(paste0("./figures/", pro_name, "_passInitialQC_cells_umap.pdf"), p1, width = 5, height = 4)
 
-#----remove outlier cluster c0 and cluster that have less 3 cells.
+#----remove outlier cluster c0 and cluster that have less 6 cells.
 #----paired samples
 clone_num <- table(varbin_mtx_tumor_log@colData$subclones, varbin_mtx_tumor_log@colData$timepoint)
-clone_num_less3 <- as.data.frame(clone_num) %>% filter(Var1 != "c0") %>% 
-  filter(Freq > 0 & Freq <4) %>% mutate(comb = paste(Var2, Var1, sep = "_"))
+clone_num_less6 <- as.data.frame(clone_num) %>% filter(Var1 != "c0") %>% 
+  filter(Freq > 0 & Freq <6) %>% mutate(comb = paste(Var2, Var1, sep = "_"))
 
-varbin_mtx_tumor_log2 <- varbin_mtx_tumor_log[, !(subclones == "c0" | (varbin_mtx_tumor_log@colData$tp_clst %in% clone_num_less3$comb))]
+varbin_mtx_tumor_log2 <- varbin_mtx_tumor_log[, !(subclones == "c0" | (varbin_mtx_tumor_log@colData$tp_clst %in% clone_num_less6$comb))]
 varbin_mtx_tumor_log2@colData
 
 p1 <- ggplot(as.data.frame(varbin_mtx_tumor_log2@colData),aes(x = UMAP_1, y = UMAP_2, fill = subclones)) + 
@@ -102,7 +102,7 @@ p1 <- ggplot(as.data.frame(varbin_mtx_tumor_log2@colData),aes(x = UMAP_1, y = UM
 p1
 cowplot::ggsave2(paste0("./figures/", pro_name, "_final_filtered_cells_umap.pdf"), p1, width = 5, height = 4)
 
-tp_col <- c("deeppink", "chartreuse1")
+tp_col <- c("#EA3291", "#96C942")
 p2 <- ggplot(as.data.frame(varbin_mtx_tumor_log2@colData),aes(x = UMAP_1, y = UMAP_2, fill = timepoint)) + 
   geom_point(shape = 21, size=2.5, stroke = 0.03) + 
   scale_fill_manual(values = tp_col) + theme_classic() + 
@@ -127,7 +127,7 @@ peak_col <- c("#219ebc","#f4a261")
 names(peak_col) <- c("d", "a")
 clst_col <- new_pal[1:length(unique(anno_mtx$subclones))]
 names(clst_col) <- paste0("c", 1:length(unique(anno_mtx$subclones)))
-tp_col <- c("deeppink", "chartreuse1")
+tp_col <- c("#EA3291", "#96C942")
 names(tp_col) <- c("primary", "recurrence")
 #-----header
 ha_col=HeatmapAnnotation(foo=anno_text(chr_name, rot = 0, gp = gpar(fontsize =10)), df =chr_color, 
@@ -182,7 +182,6 @@ saveRDS(varbin_mtx_tumor_log2, file = paste0("./objects/", pro_name, c("_final_f
 # varbin_mtx_tumor_log2 <- readRDS(paste0("./objects/", pro_name, c("_final_filtered_overdisp_copykit.rds")))
 
 #-----event matrices and integer copy number-----####
-#----with subclone 20----
 ploidy_pri <- 4.199102452
 ploidy_rec <- 3.810433174
 
@@ -218,190 +217,11 @@ varbin_mtx_tumor_log2 <- runConsensusPhylo(varbin_mtx_tumor_log2)
 saveRDS(varbin_mtx_tumor_log2, file = paste0("./objects/", pro_name, c("_final_filtered_overdisp_integerCN_copykit.rds")))
 # varbin_mtx_tumor_log2 <- readRDS(paste0("./objects/", pro_name, c("_final_filtered_overdisp_integerCN_copykit.rds")))
 
-#----Number of normal cells-----
-filter_mtx <- read.table(paste0("./metrics/", pro_name, "_metadata.metrics_newnormal.txt"), header = T) 
-rownames(filter_mtx) <- filter_mtx$sample %>% janitor::make_clean_names() 
-filter_mtx2 <- filter_mtx %>% mutate(dups_percentage = dups_removed/total_reads) %>% rownames_to_column() %>% 
-  dplyr::select(c("rowname", "timepoint","reads_kept","median_bin_count","filtered","is_normal"))
-
-filter_mtx2 %>% dplyr::filter(filtered == "kept" & is_normal == T) %>% pull(timepoint) %>% table()
-
-#------Aneuploid QC-----#####
-varbin_mtx_tumor_log2 <- readRDS(paste0("./objects/", pro_name, c("_final_filtered_overdisp_copykit.rds")))
-meta_mtx <- varbin_mtx_tumor_log2@colData %>% as.data.frame()
-table(meta_mtx$timepoint)
-
-meta_mtx %>% dplyr::filter(timepoint == "primary") %>% pull(reads_total) %>% mean()
-meta_mtx %>% dplyr::filter(timepoint == "primary") %>% pull(reads_assigned_bins) %>% mean()
-meta_mtx %>% dplyr::filter(timepoint == "primary") %>% pull(percentage_duplicates) %>% mean()
-meta_mtx %>% dplyr::filter(timepoint == "primary") %>% pull(median_bin_count) %>% mean()
-
-meta_mtx %>% dplyr::filter(timepoint == "recurrence") %>% pull(reads_total) %>% mean()
-meta_mtx %>% dplyr::filter(timepoint == "recurrence") %>% pull(reads_assigned_bins) %>% mean()
-meta_mtx %>% dplyr::filter(timepoint == "recurrence") %>% pull(percentage_duplicates) %>% mean()
-meta_mtx %>% dplyr::filter(timepoint == "recurrence") %>% pull(median_bin_count) %>% mean()
-mean((meta_mtx %>% dplyr::filter(timepoint == "recurrence"))$median_bin_count)
-
-#------filtering status heatmap---####
-varbin_mtx <- readVarbinCNA(raw_path, remove_Y = TRUE)
-varbin_mtx_tumor_log2 <- readRDS(paste0("./objects/", pro_name, c("_final_filtered_copykit.rds")))
-
-all_mtx <- as.data.frame(varbin_mtx@colData) %>% 
-  mutate(filter_state = ifelse(sample %in% rownames(varbin_mtx_tumor_log2@colData),"kept", "removed")) %>% dplyr::select("filter_state")
-all_name_meta <- rownames(varbin_mtx@colData) %>% as.data.frame() %>% dplyr::rename(my_name = ".") %>%  
-  mutate(peak = ifelse(stringr::str_detect(my_name, "_d_"), "d", ifelse(stringr::str_detect(my_name, "_a_"), "a", "nopeakinfo")),
-         timepoint = ifelse(stringr::str_detect(my_name, "_nki19p_"), "primary", 
-                            ifelse(stringr::str_detect(my_name, "_nki19re_"), "recurrence", "notimepoint"))) %>% 
-  dplyr::select(c("peak", "timepoint"))
-
-varbin_mtx@colData <- cbind(varbin_mtx@colData, all_mtx, all_name_meta)
-
-all_mtx_srt <- as.data.frame(varbin_mtx@colData) %>% arrange(factor(filter_state, levels = c("kept","removed")))
-ht_all_mtx <- log2(t(varbin_mtx@assays@data$segment_ratios))[all_mtx_srt$sample,]
-
-#----annotation bar--
-anno_mtx <- all_mtx_srt %>% dplyr::select(c("filter_state","timepoint","peak")) 
-rownames(anno_mtx) <- NULL
-peak_col <- c("#219ebc","#f4a261","#d9d9d9")
-names(peak_col) <- c("d", "a","nopeakinfo")
-fs_col <- c("#2E8B58", "#BFBEBE")
-names(fs_col) <- c("kept", "removed")
-tp_col <- c("deeppink", "chartreuse1")
-names(tp_col) <- c("primary", "recurrence")
-ha_row=rowAnnotation(df = anno_mtx, col = list(peak=peak_col, filter_state=fs_col, timepoint=tp_col), show_annotation_name = F)
-
-#-----header
-ha_col=HeatmapAnnotation(foo=anno_text(chr_name, rot = 0, gp = gpar(fontsize =10)), df =chr_color, 
-                         col = list(chr=c("1"="black", "2"="grey")), show_legend = F, annotation_name_side = "left")
-
-breaks = c(-1,0,1)
-col_vec = circlize::colorRamp2(breaks =breaks, c("dodgerblue4", "white", "firebrick4"))
-
-pdf(paste0("./figures/", pro_name, "_complexHeatmap_filter_states.pdf"), height = 8, width = 6)
-Heatmap(as.matrix(ht_all_mtx), cluster_columns = FALSE, border = TRUE, cluster_rows = TRUE, show_row_dend = FALSE, 
-        row_split = anno_mtx$filter_state,
-        name = "scheatmap", show_row_names = F, show_column_names = F, 
-        row_title = paste0("single cells: total: ",nrow(anno_mtx)," (",names(table(anno_mtx$filter_state)[1]), ": ", 
-                           table(anno_mtx$filter_state)[1], "; ", names(table(anno_mtx$filter_state)[2]), ": ", 
-                           table(anno_mtx$filter_state)[2], ")"), 
-        column_title = paste0(pro_name, "_scHeatmap"), use_raster = T, raster_quality = 5, col = col_vec, 
-        heatmap_legend_param = list(title = "Log2 (Ratio)", title_gp = gpar(fontsize = 12, fontface = "bold"), 
-                                    labels_gp = gpar(fontsize = 12)), top_annotation = ha_col, left_annotation = ha_row)
-dev.off()
-
-#-----Single cell Ratio plot----#####
-cellname <- c("sc132_nki19p_r45c54yes_s_19p_a_w_b1_s3295_r1_001")
-cellname <- janitor::make_clean_names(cellname)
-
-varbin_mtx_tumor_log2 <- readRDS(paste0("./objects/", pro_name, c("_final_filtered_overdisp_integerCN_copykit.rds")))
-
-#---preparing x axis--
-chrom.lengths <- c(249250621, 243199373, 198022430, 191154276, 180915260, 171115067, 159138663, 146364022, 
-                   141213431, 135534747, 135006516, 133851895, 115169878, 107349540, 102531392, 90354753,
-                   81195210, 78077248, 59128983, 63025520, 48129895, 51304566, 155270560)
-chrom.names <- c(paste0("chr", 1:22),"chrX")
-chrom.abspos.end <- cumsum(chrom.lengths)
-names(chrom.abspos.end) <- chrom.names
-chrom.abspos.start <- c(0, chrom.abspos.end[1:(length(chrom.abspos.end) - 1)])
-names(chrom.abspos.start) <- names(chrom.abspos.end)
-
-# Creating data frame object for chromosome rectangles shadows
-chrom.rects <- data.frame(xstart = chrom.abspos.start, xend = chrom.abspos.end)
-xbreaks <- rowMeans(chrom.rects)
-chrom.rects$colors <-c(rep(c("white", "gray"), 11), "white")
-
-#chromosomes squares background
-ggchr.back <- list(geom_rect(data = chrom.rects, aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = Inf, fill = colors), alpha = .2), 
-                   scale_fill_identity()) 
-
-sec_breaks <- c(0, 0.5e9, 1e9, 1.5e9, 2e9, 2.5e9, 3e9)
-sec_labels <- c(0, 0.5, 1, 1.5, 2, 2.5, 3)
-
-#---get ratio and integer data---
-cell_bin_ratio <- varbin_mtx_tumor_log2@assays@data$ratios[, ..cellname]
-cell_seg_ratio <- varbin_mtx_tumor_log2@assays@data$segment_ratios[, cellname]
-cell_int_seg_ratio <- varbin_mtx_tumor_log2@assays@data$integer[, cellname]
-
-#----color dots with ploidy---
-ploidy_cell <- round(varbin_mtx_tumor_log2@colData[cellname,]$ploidy_used)
-int_color0 <- pals::ocean.balance(length(0:(2*ploidy_cell))) %>% str_replace( "#F0ECEB" ,"grey75")
-
-if(length(int_color0)>=max(cell_int_seg_ratio)){
-  int_color <- int_color0
-  names(int_color) <- 0:(2*ploidy_cell)
-} else {
-  int_color <- c(int_color0, rep(int_color0[length(int_color0)],times = (max(cell_int_seg_ratio) - 2*ploidy_cell)))
-  names(int_color) <- 0:max(cell_int_seg_ratio)
-}
-
-#----make matrix--
-ratio_mtx <- cbind(varbin_mtx_tumor_log2@rowRanges$abspos, cell_bin_ratio, cell_seg_ratio, cell_int_seg_ratio) %>% 
-  dplyr::rename(chr_abs="V1", cell_ratio = all_of(cellname)) %>% 
-  dplyr::mutate(int_col = plyr::mapvalues(cell_int_seg_ratio, from = as.numeric(names(int_color)), to = int_color))
-
-#---integer color---
-p1 <- ggplot(ratio_mtx) + geom_point(aes(x = chr_abs, y = cell_ratio, color = factor(cell_int_seg_ratio)), 
-                                     shape = 20, size = 0.5, alpha = .7) +
-  scale_color_manual(values = int_color[names(table(ratio_mtx$cell_int_seg_ratio))]) +
-  geom_line(aes(chr_abs, cell_seg_ratio), col = "black", size = 0.5) + ggchr.back + 
-  scale_x_continuous(breaks = xbreaks, labels = gsub("chr", "", chrom.names), position = "top", expand = c(0,0),
-                     sec.axis = sec_axis(~., breaks = sec_breaks, labels = sec_labels, name = "Genome Position (Gb)")) +
-  scale_y_continuous(limits = c(0, 3.5), sec.axis = sec_axis(~ . * ploidy_cell, name = "integer copy number")) +
-  theme_classic() + ggtitle(paste0(pro_name,": ",cellname, " ploidy: ",ploidy_cell)) + 
-  theme(axis.title.x.top = element_blank(), legend.position = "right") +
-  guides(color = guide_legend(override.aes = list(size=5, shape = 16)))
-p1
-p2 <- ggrastr::rasterize(p1, layers='Point', dpi=350)
-cowplot::ggsave2(paste0("./figures/", pro_name,"_",cellname, "_ratio_plot.pdf"), p2, width = 8, height = 2.5)
-
-
-#----with subclone 20 but without bad cells----
-varbin_mtx_tumor_log2 <- readRDS(paste0("./objects/", pro_name, c("_final_filtered_overdisp_copykit.rds")))
-no_c20_names <- rownames(varbin_mtx_tumor_log2@colData %>% as.data.frame() %>% 
-                           dplyr::filter(!(subclones == "c20" & timepoint == "recurrence")))
-varbin_mtx_tumor_log2 <- varbin_mtx_tumor_log2[,no_c20_names]
-
-ploidy_pri <- 4.199102452
-ploidy_rec <- 3.810433174
-
-varbin_mtx_tumor_log2@colData$ploidy_used <- as.numeric(plyr::mapvalues(varbin_mtx_tumor_log2@colData$timepoint, 
-                                                                        from = c("primary","recurrence"), 
-                                                                        to = c(ploidy_pri, ploidy_rec)))
-
-varbin_mtx_tumor_log2 <- calcInteger(varbin_mtx_tumor_log2, assay = "segment_ratios", method = "fixed", 
-                                     ploidy_value = colData(varbin_mtx_tumor_log2)$ploidy_used)
-varbin_mtx_tumor_log2 <- calcConsensus(varbin_mtx_tumor_log2, assay = "integer", fun="median", consensus_by = "subclones")
-
-ploidy_trunc <- round(2*mean(colData(varbin_mtx_tumor_log2)$ploidy_used))
-eventmat <- getEventMat(varbin_mtx_tumor_log2, bin_adj = 2, ploidy_trunc = ploidy_trunc)
-
-## convert back to segmentation level
-popseg_long <- as.data.frame(apply(as.data.frame(t(eventmat %>% dplyr::select(matches("c[0-9]+")))), 1, 
-                                   function(m) {rep.int(m, eventmat$n.bins)}))
-
-## make medicc input matrix
-medicc_input <- cbind(SummarizedExperiment::rowRanges(varbin_mtx_tumor_log2) %>% dplyr::as_tibble() %>% 
-                        dplyr::select(seqnames, start, end), popseg_long) %>%
-  mutate(diploid=2) %>%          ## here we manually add a diploid cell CN profile to be used as root in the medicc tree
-  dplyr::rename(chrom=seqnames) %>% gather('sample_id', 'CN', -chrom, -start, -end) %>% dplyr::select(sample_id,chrom, everything())
-
-dir.create(paste0("./metrics/medicc_files/", pro_name), recursive = T)
-write_tsv(medicc_input, file = paste0("./metrics/medicc_files/", pro_name, "/",pro_name, c("_medicc2_input.tsv")))
-# medicc_input <- read_tsv(file = paste0("./metrics/medicc_files/", pro_name, "/",pro_name, c("_medicc2_input.tsv")))
-
-attr(popseg_long, "consensus_by") <- "subclones"
-attr(popseg_long, "consensus_assay") <- "integer"
-copykit::consensus(varbin_mtx_tumor_log2) <- popseg_long
-varbin_mtx_tumor_log2 <- runConsensusPhylo(varbin_mtx_tumor_log2)
-
-saveRDS(varbin_mtx_tumor_log2, file = paste0("./objects/", pro_name, c("_with_c20_but_nobadcell_final_filtered_overdisp_integerCN_copykit.rds")))
-# varbin_mtx_tumor_log2 <- readRDS(paste0("./objects/", pro_name, c("_with_c20_but_nobadcell_final_filtered_overdisp_integerCN_copykit.rds")))
-
 #-----MEDICC2 Tree----######
 mywd <- getwd()
 #----go to terminal and run medicc2---
 # conda activate medicc_env
-# medicc2 -a CN --total-copy-numbers -j 40 -vv input_path output_path
+# medicc2 -a CN --total-copy-numbers -j 40 -vv input_path/file output_path
 
 tsv_out_path <- paste0(mywd, "/metrics/medicc_files/", pro_name, "/")
 medic <- ape::read.tree(paste0(tsv_out_path, pro_name,"_medicc2_input_final_tree.new"))
@@ -524,5 +344,77 @@ ppr <- Heatmap(t(mrca_mat), cluster_columns = FALSE, border = TRUE, cluster_rows
 
 pdf(paste0("./figures/", pro_name, "_complexHeatmap_consensus_integer_pca_rca_merged.pdf"), height = 6, width = 9)
 draw(pc %v% ppr, ht_gap = unit(0.5, 'cm'), merge_legend = T,auto_adjust = T)
+dev.off()
+
+
+#----Number of normal cells-----
+filter_mtx <- read.table(paste0("./metrics/", pro_name, "_metadata.metrics_newnormal.txt"), header = T) 
+rownames(filter_mtx) <- filter_mtx$sample %>% janitor::make_clean_names() 
+filter_mtx2 <- filter_mtx %>% mutate(dups_percentage = dups_removed/total_reads) %>% rownames_to_column() %>% 
+  dplyr::select(c("rowname", "timepoint","reads_kept","median_bin_count","filtered","is_normal"))
+
+filter_mtx2 %>% dplyr::filter(filtered == "kept" & is_normal == T) %>% pull(timepoint) %>% table()
+
+#------Aneuploid QC-----#####
+varbin_mtx_tumor_log2 <- readRDS(paste0("./objects/", pro_name, c("_final_filtered_overdisp_copykit.rds")))
+meta_mtx <- varbin_mtx_tumor_log2@colData %>% as.data.frame()
+table(meta_mtx$timepoint)
+
+meta_mtx %>% dplyr::filter(timepoint == "primary") %>% pull(reads_total) %>% mean()
+meta_mtx %>% dplyr::filter(timepoint == "primary") %>% pull(reads_assigned_bins) %>% mean()
+meta_mtx %>% dplyr::filter(timepoint == "primary") %>% pull(percentage_duplicates) %>% mean()
+meta_mtx %>% dplyr::filter(timepoint == "primary") %>% pull(median_bin_count) %>% mean()
+
+meta_mtx %>% dplyr::filter(timepoint == "recurrence") %>% pull(reads_total) %>% mean()
+meta_mtx %>% dplyr::filter(timepoint == "recurrence") %>% pull(reads_assigned_bins) %>% mean()
+meta_mtx %>% dplyr::filter(timepoint == "recurrence") %>% pull(percentage_duplicates) %>% mean()
+meta_mtx %>% dplyr::filter(timepoint == "recurrence") %>% pull(median_bin_count) %>% mean()
+mean((meta_mtx %>% dplyr::filter(timepoint == "recurrence"))$median_bin_count)
+
+#------filtering status heatmap---####
+varbin_mtx <- readVarbinCNA(raw_path, remove_Y = TRUE)
+varbin_mtx_tumor_log2 <- readRDS(paste0("./objects/", pro_name, c("_final_filtered_copykit.rds")))
+
+all_mtx <- as.data.frame(varbin_mtx@colData) %>% 
+  mutate(filter_state = ifelse(sample %in% rownames(varbin_mtx_tumor_log2@colData),"kept", "removed")) %>% dplyr::select("filter_state")
+all_name_meta <- rownames(varbin_mtx@colData) %>% as.data.frame() %>% dplyr::rename(my_name = ".") %>%  
+  mutate(peak = ifelse(stringr::str_detect(my_name, "_d_"), "d", ifelse(stringr::str_detect(my_name, "_a_"), "a", "nopeakinfo")),
+         timepoint = ifelse(stringr::str_detect(my_name, "_nki19p_"), "primary", 
+                            ifelse(stringr::str_detect(my_name, "_nki19re_"), "recurrence", "notimepoint"))) %>% 
+  dplyr::select(c("peak", "timepoint"))
+
+varbin_mtx@colData <- cbind(varbin_mtx@colData, all_mtx, all_name_meta)
+
+all_mtx_srt <- as.data.frame(varbin_mtx@colData) %>% arrange(factor(filter_state, levels = c("kept","removed")))
+ht_all_mtx <- log2(t(varbin_mtx@assays@data$segment_ratios))[all_mtx_srt$sample,]
+
+#----annotation bar--
+anno_mtx <- all_mtx_srt %>% dplyr::select(c("filter_state","timepoint","peak")) 
+rownames(anno_mtx) <- NULL
+peak_col <- c("#219ebc","#f4a261","#d9d9d9")
+names(peak_col) <- c("d", "a","nopeakinfo")
+fs_col <- c("#2E8B58", "#BFBEBE")
+names(fs_col) <- c("kept", "removed")
+tp_col <- c("#EA3291", "#96C942")
+names(tp_col) <- c("primary", "recurrence")
+ha_row=rowAnnotation(df = anno_mtx, col = list(peak=peak_col, filter_state=fs_col, timepoint=tp_col), show_annotation_name = F)
+
+#-----header
+ha_col=HeatmapAnnotation(foo=anno_text(chr_name, rot = 0, gp = gpar(fontsize =10)), df =chr_color, 
+                         col = list(chr=c("1"="black", "2"="grey")), show_legend = F, annotation_name_side = "left")
+
+breaks = c(-1,0,1)
+col_vec = circlize::colorRamp2(breaks =breaks, c("dodgerblue4", "white", "firebrick4"))
+
+pdf(paste0("./figures/", pro_name, "_complexHeatmap_filter_states.pdf"), height = 8, width = 6)
+Heatmap(as.matrix(ht_all_mtx), cluster_columns = FALSE, border = TRUE, cluster_rows = TRUE, show_row_dend = FALSE, 
+        row_split = anno_mtx$filter_state,
+        name = "scheatmap", show_row_names = F, show_column_names = F, 
+        row_title = paste0("single cells: total: ",nrow(anno_mtx)," (",names(table(anno_mtx$filter_state)[1]), ": ", 
+                           table(anno_mtx$filter_state)[1], "; ", names(table(anno_mtx$filter_state)[2]), ": ", 
+                           table(anno_mtx$filter_state)[2], ")"), 
+        column_title = paste0(pro_name, "_scHeatmap"), use_raster = T, raster_quality = 5, col = col_vec, 
+        heatmap_legend_param = list(title = "Log2 (Ratio)", title_gp = gpar(fontsize = 12, fontface = "bold"), 
+                                    labels_gp = gpar(fontsize = 12)), top_annotation = ha_col, left_annotation = ha_row)
 dev.off()
 
