@@ -100,13 +100,13 @@ p1 <- ggplot(as.data.frame(varbin_mtx_merged@colData),aes(x = UMAP_1m, y = UMAP_
 p1
 cowplot::ggsave2(paste0("./figures/", pro_name, "_passInitialQC_cells_umap.pdf"), p1, width = 5, height = 4)
 
-#----remove outlier cluster c0 and cluster that have less 3 cells.
+#----remove outlier cluster c0 and cluster that have less 6 cells.
 #----paired samples
 clone_num <- table(varbin_mtx_merged@colData$subclones, varbin_mtx_merged@colData$condition)
-clone_num_less3 <- as.data.frame(clone_num) %>% filter(Var1 != "c0") %>% filter(Freq > 0 & Freq <4) %>% 
+clone_num_less6 <- as.data.frame(clone_num) %>% filter(Var1 != "c0") %>% filter(Freq > 0 & Freq <6) %>% 
   mutate(comb = paste(Var2, Var1, sep = "_"))
 
-varbin_mtx_merged2 <- varbin_mtx_merged[, !(subclones == "c0" | (varbin_mtx_merged@colData$tp_clstm %in% clone_num_less3$comb))]
+varbin_mtx_merged2 <- varbin_mtx_merged[, !(subclones == "c0" | (varbin_mtx_merged@colData$tp_clstm %in% clone_num_less6$comb))]
 varbin_mtx_merged2@colData
 
 #----Plot UMAPs-----
