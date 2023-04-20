@@ -142,69 +142,6 @@ write.csv(preduk249_corr_df, "./metrics/duke249_P1R_spearman_cor.csv")
 preduk249_corr_df <- read.csv("./metrics/duke249_P1R_spearman_cor.csv", row.names = 1)
 
 
-# NKI19P  (P8P---PCR duplicate rates: 54.24%)-----
-# link_bam_files(bincounts = NKI19_bincounts_p,
-#                path_bam_files = "/bam/file/path/",
-#                output_path = "/downsample_corr/NKI19/",
-#                output_name = "nki19p_cor_list",
-#                target_reads = 1000000)
-
-#./run_CNA.sh --bam nki19_bam_input_1M --sample nki19_1M --output nki19_1M --cpu 10
-#./run_CNA.sh --bam nki19_bam_input_750k --sample nki19_750k --output nki19_750k --cpu 10
-#./run_CNA.sh --bam nki19_bam_input_500k --sample nki19_500k --output nki19_500k --cpu 10
-#./run_CNA.sh --bam nki19_bam_input_250k --sample nki19_250k --output nki19_250k --cpu 10
-#./run_CNA.sh --bam nki19_bam_input_125k --sample nki19_125k --output nki19_125k --cpu 10
-#./run_CNA.sh --bam nki19_bam_input_75k --sample nki19_75k --output nki19_75k --cpu 10 --filter_ReadCount=10000
-#./run_CNA.sh --bam nki19_bam_input_50k --sample nki19_50k --output nki19_50k --cpu 10 --filter_ReadCount=10000
-
-# reading files segs
-nki19_original_seg <- read.table("/CNA_pipeline/outpath/final_result/uber.NKI19.seg.txt", header = T)
-nki19_1M_seg <- read.table("/CNA_pipeline/outpath/nki19_1M/final_result/uber.nki19_1M.seg.txt", header = T)
-names(nki19_1M_seg) <- str_remove(names(nki19_1M_seg), '.sort')
-nki19_750k_seg <- read.table("/CNA_pipeline/outpath/nki19_750k/final_result/uber.nki19_750k.seg.txt", header = T)
-names(nki19_750k_seg) <- str_remove(names(nki19_750k_seg), '.sort')
-nki19_500k_seg <- read.table("/CNA_pipeline/outpath/nki19_500k/final_result/uber.nki19_500k.seg.txt", header = T)
-names(nki19_500k_seg) <- str_remove(names(nki19_500k_seg), '.sort')
-nki19_250k_seg <- read.table("/CNA_pipeline/outpath/nki19_250k/final_result/uber.nki19_250k.seg.txt", header = T)
-names(nki19_250k_seg) <- str_remove(names(nki19_250k_seg), '.sort')
-nki19_125k_seg <- read.table("/CNA_pipeline/outpath/nki19_125k/final_result/uber.nki19_125k.seg.txt", header = T)
-names(nki19_125k_seg) <- str_remove(names(nki19_125k_seg), '.sort')
-nki19_75k_seg <- read.table("/CNA_pipeline/outpath/nki19_75k/final_result/uber.nki19_75k.seg.txt", header = T)
-names(nki19_75k_seg) <- str_remove(names(nki19_75k_seg), '.sort')
-nki19_50k_seg <- read.table("/CNA_pipeline/outpath/nki19_50k/final_result/uber.nki19_50k.seg.txt", header = T)
-names(nki19_50k_seg) <- str_remove(names(nki19_50k_seg), '.sort')
-
-nki19_cor_1M <- corr_cells(nki19_original_seg, nki19_1M_seg)
-nki19_cor_750k <- corr_cells(nki19_original_seg, nki19_750k_seg)
-nki19_cor_500k <- corr_cells(nki19_original_seg, nki19_500k_seg)
-nki19_cor_250k <- corr_cells(nki19_original_seg, nki19_250k_seg)
-nki19_cor_125k <- corr_cells(nki19_original_seg, nki19_125k_seg)
-nki19_cor_75k <- corr_cells(nki19_original_seg, nki19_75k_seg)
-nki19_cor_50k <- corr_cells(nki19_original_seg, nki19_50k_seg)
-
-nki19_corr_df <- create_corr_df(nki19_cor_1M,
-                                nki19_cor_750k,
-                                nki19_cor_500k,
-                                nki19_cor_250k,
-                                nki19_cor_125k,
-                                nki19_cor_75k,
-                                nki19_cor_50k)
-
-p1 <- ggplot(nki19_corr_df, aes(x = n_reads, y = correlation)) + 
-  ylim(c(0, 1)) + 
-  geom_jitter(aes(color = n_reads),position = position_jitter(seed = 1, width = 0.2), size = 0.01) +
-  geom_violin(alpha=0, size = 0.2) + 
-  stat_summary(fun = median, fun.min = function(z) quantile(z, 0.25),
-               fun.max = function(z) quantile(z, 0.75)) + 
-  cowplot::theme_cowplot() +
-  xlab("number of reads (downsampled)") + ylab("correlation with original profile")
-
-p1
-cowplot::ggsave2("./figures/downsample_nki19_P8P_spearman_cor_pvln.pdf", p1, width = 5, height = 4)  
-
-write.csv(nki19_corr_df, "./metrics/nki19_P8P_spearman_cor.csv")
-nki19_corr_df <- read.csv("./metrics/nki19_P8P_spearman_cor.csv", row.names = 1)
-
 # DUK254P  (P4P---PCR duplicate rates: 74.36%)-----
 # link_bam_files(bincounts = preduk254_bincounts_p,
 #                path_bam_files = "/bam/file/path/",
@@ -272,9 +209,8 @@ write.csv(preduk254_corr_df, "./metrics/duke254_P4P_spearman_cor.csv")
 #----Calculate median correlation score----
 mda231 <- wafer_mda231p_corr_df %>% group_by(n_reads) %>% summarise(median_cor = median(correlation))
 duke249 <- preduk249_corr_df %>% group_by(n_reads) %>% summarise(median_cor = median(correlation)) %>% pull(median_cor)
-nki19 <- nki19_corr_df %>% group_by(n_reads) %>% summarise(median_cor = median(correlation)) %>% pull(median_cor)
 duke254 <- preduk254_corr_df %>% group_by(n_reads) %>% summarise(median_cor = median(correlation)) %>% pull(median_cor)
-all_sum <- cbind(mda231,duke249, nki19, duke254) %>% column_to_rownames(var = "n_reads") 
+all_sum <- cbind(mda231,duke249, duke254) %>% column_to_rownames(var = "n_reads") 
 all_sum <- all_sum[n_reads_levels,]
 
 all_mean <- apply(all_sum, 1, mean)
@@ -287,8 +223,6 @@ all_sum2 <- cbind(all_sum, all_mean, all_sd)
 wafer_mda231p_corr_df <- read.csv("./metrics/mda231_spearman_cor.csv", row.names = 1)
 #--DUK249RE  (PCR duplicate rates: 22.76%)
 preduk249_corr_df <- read.csv("./metrics/duke249_P1R_spearman_cor.csv", row.names = 1)
-#--NKI19P  (PCR duplicate rates: 54.24%)
-nki19_corr_df <- read.csv("./metrics/nki19_P8P_spearman_cor.csv", row.names = 1)
 #--DUK254P  (PCR duplicate rates: 74.36%)
 preduk254_corr_df <- read.csv("./metrics/duke254_P4P_spearman_cor.csv", row.names = 1)
 
@@ -316,17 +250,6 @@ p2 <- preduk249_corr_df %>% mutate(n_reads = fct_relevel(n_reads, n_reads_levels
   theme(axis.text.x = element_blank(), axis.title.x = element_blank(), legend.position = 'none', 
         plot.title = element_text(hjust = 0.5), axis.title.y = element_blank()) 
 
-p3 <- nki19_corr_df %>%  mutate(n_reads = fct_relevel(n_reads, n_reads_levels)) %>% 
-  ggplot(aes(x = n_reads, y = correlation)) + 
-  ylim(c(0, 1)) + 
-  geom_jitter(aes(color = n_reads),position = position_jitter(seed = 1, width = 0.2), size = 0.01) +
-  geom_violin(alpha=0, size = 0.2) + 
-  stat_summary(fun = median, fun.min = function(z) quantile(z, 0.25),
-               fun.max = function(z) quantile(z, 0.75)) + 
-  cowplot::theme_cowplot() + ggtitle("P8P (PCR dup: 54.24%)") + 
-  theme(legend.position = 'none', plot.title = element_text(hjust = 0.5)) + 
-  xlab("number of reads (downsampled)") + ylab("correlation with original profile")
-
 p4 <- preduk254_corr_df %>% mutate(n_reads = fct_relevel(n_reads, n_reads_levels)) %>% 
   ggplot(aes(x = n_reads, y = correlation)) + 
   ylim(c(0, 1)) + 
@@ -338,10 +261,10 @@ p4 <- preduk254_corr_df %>% mutate(n_reads = fct_relevel(n_reads, n_reads_levels
   theme(legend.position = 'none', plot.title = element_text(hjust = 0.5), axis.title.y = element_blank()) + 
   xlab("number of reads (downsampled)") + ylab("correlation with original profile")
 
-p5 <- plot_grid(plotlist=list(p1,p2,p3,p4), ncol=2, align='v')
+p5 <- plot_grid(plotlist=list(p1,p2,p4), ncol=3, align='v')
 p6 <- ggrastr::rasterize(p5, layers='Point', dpi=300)
 
-cowplot::ggsave2("./figures/downsample_seg_correlation.pdf", p5, width = 7, height = 6)
-cowplot::ggsave2("./figures/downsample_seg_correlation_raster.pdf", p6, width = 7, height = 6)
+cowplot::ggsave2("./figures/downsample_seg_correlation.pdf", p5, width = 10.5, height = 3)
+cowplot::ggsave2("./figures/downsample_seg_correlation_raster.pdf", p6, width = 10.5, height = 3)
 
 
