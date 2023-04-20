@@ -108,7 +108,7 @@ cowplot::ggsave2(paste0("./figures/", pro_name, "_passInitialQC_cells_umap.pdf")
 #----remove outlier cluster c0 and cluster that have less 6 cells.
 #----paired samples
 clone_num <- table(varbin_mtx_tumor_log@colData$subclones, varbin_mtx_tumor_log@colData$timepoint)
-clone_num_less6 <- as.data.frame(clone_num) %>% filter(Var1 != "c0") %>% filter(Freq > 0 & Freq <4)
+clone_num_less6 <- as.data.frame(clone_num) %>% filter(Var1 != "c0") %>% filter(Freq > 0 & Freq <6)
 
 varbin_mtx_tumor_log2 <- varbin_mtx_tumor_log[, !(subclones == "c0" | 
                                                     ((varbin_mtx_tumor_log@colData$subclones %in% clone_num_less6$Var1) & 
