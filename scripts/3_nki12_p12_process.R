@@ -87,13 +87,13 @@ p1 <- ggplot(as.data.frame(varbin_mtx_tumor_log@colData),aes(x = UMAP_1, y = UMA
 p1
 cowplot::ggsave2(paste0("./figures/", pro_name, "_passIntialQC_cells_umap.pdf"), p1, width = 5, height = 4)
 
-#----remove outlier cluster c0 and cluster that have less 3 cells.
+#----remove outlier cluster c0 and cluster that have less 6 cells.
 #----paired samples
 clone_num <- table(varbin_mtx_tumor_log@colData$subclones, varbin_mtx_tumor_log@colData$timepoint)
-clone_num_less3 <- as.data.frame(clone_num) %>% filter(Var1 != "c0") %>% filter(Freq > 0 & Freq <4) %>% 
+clone_num_less6 <- as.data.frame(clone_num) %>% filter(Var1 != "c0") %>% filter(Freq > 0 & Freq <6) %>% 
   mutate(comb = paste(Var2, Var1, sep = "_"))
 
-varbin_mtx_tumor_log2 <- varbin_mtx_tumor_log[, !(subclones == "c0" | (varbin_mtx_tumor_log@colData$tp_clst %in% clone_num_less3$comb))]
+varbin_mtx_tumor_log2 <- varbin_mtx_tumor_log[, !(subclones == "c0" | (varbin_mtx_tumor_log@colData$tp_clst %in% clone_num_less6$comb))]
 varbin_mtx_tumor_log2@colData
 
 p1 <- ggplot(as.data.frame(varbin_mtx_tumor_log2@colData),aes(x = UMAP_1, y = UMAP_2, fill = subclones)) + 
@@ -103,7 +103,7 @@ p1 <- ggplot(as.data.frame(varbin_mtx_tumor_log2@colData),aes(x = UMAP_1, y = UM
 p1
 cowplot::ggsave2(paste0("./figures/", pro_name, "_final_filtered_cells_umap.pdf"), p1, width = 5, height = 4)
 
-tp_col <- c("deeppink", "chartreuse1")
+tp_col <- c("#EA3291", "#96C942")
 p2 <- ggplot(as.data.frame(varbin_mtx_tumor_log2@colData),aes(x = UMAP_1, y = UMAP_2, fill = timepoint)) + 
   geom_point(shape = 21, size=2.5, stroke = 0.03) + 
   scale_fill_manual(values = tp_col) + theme_classic() + 
@@ -128,7 +128,7 @@ peak_col <- c("#219ebc","#f4a261")
 names(peak_col) <- c("d", "a")
 clst_col <- new_pal[1:length(unique(anno_mtx$subclones))]
 names(clst_col) <- paste0("c", 1:length(unique(anno_mtx$subclones)))
-tp_col <- c("deeppink", "chartreuse1")
+tp_col <- c("#EA3291", "#96C942")
 names(tp_col) <- c("primary", "recurrence")
 #-----header
 ha_col=HeatmapAnnotation(foo=anno_text(chr_name, rot = 0, gp = gpar(fontsize =10)), df =chr_color, 
@@ -278,6 +278,10 @@ cowplot::ggsave2(paste0("./figures/", pro_name, "_medicc2_tree.pdf"), treeplt2, 
 lab <-  (treeplt[["data"]] %>% arrange(y))$label
 my_order <- rev(lab[grepl("c[0-9]+", lab, perl = T)])
 
+treeplt_temp <- ggtree::ggtree(ape::ladderize(tree), ladderize = FALSE, size = .2) + ggtree::geom_tiplab()+ggtree::geom_nodelab()
+tree_temp <- ggtree::inset(treeplt_temp, pies, width=0.02, height=0.02)
+cowplot::ggsave2(paste0("./figures/", pro_name, "_medicc2_tree_node.pdf"), tree_temp, width = 10, height = 10)
+
 #----plot consensus heatmap ----
 cs_mtx <- t(varbin_mtx_tumor_log2@consensus)
 cs_mtx_order <- cs_mtx[my_order,]
@@ -357,7 +361,7 @@ peak_col <- c("#219ebc","#f4a261","#d9d9d9")
 names(peak_col) <- c("d", "a","nopeakinfo")
 fs_col <- c("#2E8B58", "#BFBEBE")
 names(fs_col) <- c("kept", "removed")
-tp_col <- c("deeppink", "chartreuse1")
+tp_col <- c("#EA3291", "#96C942")
 names(tp_col) <- c("primary", "recurrence")
 ha_row=rowAnnotation(df = anno_mtx, col = list(peak=peak_col, filter_state=fs_col, timepoint=tp_col), show_annotation_name = F)
 
@@ -379,4 +383,3 @@ Heatmap(as.matrix(ht_all_mtx), cluster_columns = FALSE, border = TRUE, cluster_r
         heatmap_legend_param = list(title = "Log2 (Ratio)", title_gp = gpar(fontsize = 12, fontface = "bold"), 
                                     labels_gp = gpar(fontsize = 12)), top_annotation = ha_col, left_annotation = ha_row)
 dev.off()
-
