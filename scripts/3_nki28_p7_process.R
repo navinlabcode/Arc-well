@@ -105,7 +105,7 @@ p1 <- ggplot(as.data.frame(varbin_mtx_tumor_log2@colData),aes(x = UMAP_1, y = UM
 p1
 cowplot::ggsave2(paste0("./figures/", pro_name, "_final_filtered_cells_umap.pdf"), p1, width = 5, height = 4)
 
-tp_col <- c("deeppink", "chartreuse1")
+tp_col <- c("#EA3291", "#96C942")
 p2 <- ggplot(as.data.frame(varbin_mtx_tumor_log2@colData),aes(x = UMAP_1, y = UMAP_2, fill = timepoint)) + 
   geom_point(shape = 21, size=2.5, stroke = 0.03) + 
   scale_fill_manual(values = tp_col) + theme_classic() + 
@@ -131,7 +131,7 @@ peak_col <- c("#219ebc","#f4a261")
 names(peak_col) <- c("d", "a")
 clst_col <- new_pal[1:length(unique(anno_mtx$subclones))]
 names(clst_col) <- paste0("c", 1:length(unique(anno_mtx$subclones)))
-tp_col <- c("deeppink", "chartreuse1")
+tp_col <- c("#EA3291", "#96C942")
 names(tp_col) <- c("primary", "recurrence")
 #-----header
 ha_col=HeatmapAnnotation(foo=anno_text(chr_name, rot = 0, gp = gpar(fontsize =10)), df =chr_color, 
@@ -401,7 +401,7 @@ peak_col <- c("#219ebc","#f4a261","#d9d9d9")
 names(peak_col) <- c("d", "a","nopeakinfo")
 fs_col <- c("#2E8B58", "#BFBEBE")
 names(fs_col) <- c("kept", "removed")
-tp_col <- c("deeppink", "chartreuse1")
+tp_col <- c("#EA3291", "#96C942")
 names(tp_col) <- c("primary", "recurrence")
 ha_row=rowAnnotation(df = anno_mtx, col = list(peak=peak_col, filter_state=fs_col, timepoint=tp_col), show_annotation_name = F)
 
