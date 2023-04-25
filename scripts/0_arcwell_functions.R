@@ -617,8 +617,8 @@ calc_coverage <- function(path) {
   # path <- my_cov
   inpaths <- Sys.glob(paste0(path, "*.covhist.txt"))
   coverage.stats <- tibble(bed_path=inpaths) %>%
-    mutate(cellname = stringr::str_extract(basename(bed_path), "^[^.]*")) %>% group_by(cellname) %>%
-    summarize(.groups="keep", readr::read_tsv(bed_path, 
+    mutate(cellname = stringr::str_extract(basename(bed_path), "^[^.]*")) %>% dplyr::group_by(cellname) %>%
+    dplyr::summarize(.groups="keep", readr::read_tsv(bed_path, 
                                               col_names=c("refname", "depth", "count", "refsize", "frac"),
                                               col_types=cols(col_character(), col_double(), col_double(), col_double(), col_double())), ) %>%
     dplyr::filter(refname=="genome") %>%
