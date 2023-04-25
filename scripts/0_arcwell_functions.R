@@ -622,7 +622,7 @@ calc_coverage <- function(path) {
                                               col_names=c("refname", "depth", "count", "refsize", "frac"),
                                               col_types=cols(col_character(), col_double(), col_double(), col_double(), col_double())), ) %>%
     dplyr::filter(refname=="genome") %>%
-    summarize(breadth = 1 - frac[depth==0], gini_index = gini.index(depth, count), .groups="keep")
+    dplyr::summarize(breadth = 1 - frac[depth==0], gini_index = gini.index(depth, count), .groups="keep")
   
 }
 mpd_scTree <- function(df, method = "nj", metric = "manhattan", assay = "ratio", n_threads = parallel::detectCores() / 4) {
